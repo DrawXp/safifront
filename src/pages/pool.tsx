@@ -92,9 +92,9 @@ const ceilDiv = (a: bigint, b: bigint) => (a + b - 1n) / b;
 type Tab = "ADD" | "REMOVE";
 
 export default function Pool() {
-  const { address, chainId } = useAccount();
+  const { address } = useAccount();
   const pub = usePublicClient();
-  const { writeContractAsync, data: txHash, isPending } = useWriteContract();
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const factoryAddr = ADDR.factory as `0x${string}` | undefined;
 
@@ -1080,8 +1080,8 @@ async function removeLiquidity() {
         </button>
       </div>
       {selected && tokenA &&
-      !isPhrsPair &&
-      needApproveFor(aAmt, allowanceA as bigint) ? (
+	  !isPhrsPair &&
+      needApproveFor(aAmt, allowanceA as unknown as bigint) ? (
         <button
           type="button"
           onClick={() => approveToken(tokenA)}
@@ -1092,9 +1092,9 @@ async function removeLiquidity() {
         </button>
       ) : null}
       {selected && tokenA &&
-      isPhrsPair &&
+	  isPhrsPair &&
       selected.t0.toLowerCase() !== ADDR.wphrs?.toLowerCase() &&
-      needApproveFor(aAmt, allowanceA as bigint) ? (
+      needApproveFor(aAmt, allowanceA as unknown as bigint) ? (
         <button
           type="button"
           onClick={() => approveToken(tokenA)}
@@ -1137,8 +1137,8 @@ async function removeLiquidity() {
         </button>
       </div>
       {selected && tokenB &&
-      !isPhrsPair &&
-      needApproveFor(bAmt, allowanceB as bigint) ? (
+	  !isPhrsPair &&
+      needApproveFor(bAmt, allowanceB as unknown as bigint) ? (
         <button
           type="button"
           onClick={() => approveToken(tokenB)}
@@ -1149,9 +1149,9 @@ async function removeLiquidity() {
         </button>
       ) : null}
       {selected && tokenB &&
-      isPhrsPair &&
+	  isPhrsPair &&
       selected.t1.toLowerCase() !== ADDR.wphrs?.toLowerCase() &&
-      needApproveFor(bAmt, allowanceB as bigint) ? (
+      needApproveFor(bAmt, allowanceB as unknown as bigint) ? (
         <button
           type="button"
           onClick={() => approveToken(tokenB)}
