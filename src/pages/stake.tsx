@@ -4,10 +4,9 @@ import {
   useReadContract,
   useReadContracts,
   useWalletClient,
-  usePublicClient,
-  type Chain
+  usePublicClient
 } from "wagmi"
-import { parseUnits, formatUnits, type Hex } from "viem"
+import { parseUnits, formatUnits, type Hex, type Chain } from "viem"
 import toast from "react-hot-toast"
 
 import tokenArtifact from "../abis/SAFIToken.json"
@@ -257,8 +256,6 @@ export default function Stake() {
   const tokenBal = stats.tokenBal
   const staked = stats.staked
   const pending = stats.pending
-  const totalStaked = stats.totalStaked
-  const dailyEmission = stats.dailyEmission
   const projectedNext = stats.projectedNext
   const aprUserPct = stats.aprUserPct
   const hasReward = stats.hasReward
@@ -313,11 +310,11 @@ export default function Stake() {
   }, [debouncedAmtUnstake, dec])
 
 
-  const [reqRun, setReqRun] = useState<any>()
-  const [reqClaim, setReqClaim] = useState<any>()
-  const [reqClaimStake, setReqClaimStake] = useState<any>()
-  const [reqStake, setReqStake] = useState<any>()
-  const [reqUnstake, setReqUnstake] = useState<any>()
+  const [, setReqRun] = useState<any>()
+  const [, setReqClaim] = useState<any>()
+  const [, setReqClaimStake] = useState<any>()
+  const [, setReqStake] = useState<any>()
+  const [, setReqUnstake] = useState<any>()
   const [reqApprove, setReqApprove] = useState<any>()
 
   useEffect(() => {

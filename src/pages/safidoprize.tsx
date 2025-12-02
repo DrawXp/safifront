@@ -92,7 +92,7 @@ function showTxToast(hash: Hex) {
 export default function SafidoPrize() {
   const { address } = useAccount()
   const publicClient = usePublicClient()
-  const { writeContractAsync, isPending, data: txHash } = useWriteContract()
+  const { writeContractAsync, isPending } = useWriteContract()
   const { pending, claim, claimable, refresh: refreshVaultReward } = useVaultReward()
 
   const pendingWei = (pending as bigint) ?? 0n
@@ -170,7 +170,6 @@ export default function SafidoPrize() {
   const dec = Number(tokDec ?? 18)
   const symbol = (tokSym as string) ?? "SAFI"
   const potHuman = useMemo(() => formatUnits(curPotWei, dec), [curPotWei, dec])
-  const priceHuman = useMemo(() => formatUnits(priceWei, dec), [priceWei, dec])
 
   const [nowSec, setNowSec] = useState(() => Math.floor(Date.now() / 1000))
   useEffect(() => {

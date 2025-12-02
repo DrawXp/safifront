@@ -110,7 +110,7 @@ export default function Pool() {
         address: addr,
         functionName: "symbol",
         args: [],
-      })) as string;
+      })) as unknown as string;
       return labelToken(addr, String(sym || "").trim() || "UNK");
     } catch {
       try {
@@ -119,7 +119,7 @@ export default function Pool() {
           address: addr,
           functionName: "name",
           args: [],
-        })) as string;
+        })) as unknown as string;
         return labelToken(addr, String(nm || "").trim() || "UNK");
       } catch {
         return labelToken(addr, "UNK");
@@ -150,7 +150,7 @@ async function loadPairs(mounted?: { current: boolean }): Promise<PairItem[]> {
     const res = await api.dexPairs();
     if (mounted && !mounted.current) return [];
 
-    const snaps = res.pairs ?? [];
+    const snaps = (res.pairs ?? []) as any[];
     if (!snaps.length) {
       if (!mounted || mounted.current) {
         setPairs([]);
@@ -397,6 +397,10 @@ async function loadPairs(mounted?: { current: boolean }): Promise<PairItem[]> {
 
   async function approveToken(token: `0x${string}`) {
     if (!address || !ADDR.router) return;
+    if (!pub) {
+      toast.error("Network not ready");
+      return;
+    }
     try {
       const tx = await writeContractAsync({
         chainId: CHAIN_ID,
@@ -415,6 +419,10 @@ async function loadPairs(mounted?: { current: boolean }): Promise<PairItem[]> {
 
 async function approveLP() {
   if (!address || !ADDR.router || !selected) return;
+  if (!pub) {
+    toast.error("Network not ready");
+    return;
+  }
   try {
     setIsApprovingLP(true);
 
@@ -618,7 +626,7 @@ async function approveLP() {
     if (!totalSupply || r.rA === 0n || r.rB === 0n) return 0n;
     if (remA_amt === 0n && remB_amt === 0n) return 0n;
 
-    const ts = totalSupply as bigint;
+    const ts = totalSupply as unknown as bigint;
     const lpFromA = remA_amt > 0n ? ceilDiv(remA_amt * ts, r.rA) : 0n;
     const lpFromB = remB_amt > 0n ? ceilDiv(remB_amt * ts, r.rB) : 0n;
 
@@ -652,14 +660,14 @@ async function approveLP() {
   const remDisabled =
     isPending ||
     liqNeeded === 0n ||
-    (lpBal ?? 0n) < liqNeeded ||
+    ((lpBal != null ? (lpBal as unknown as bigint) : 0n) < liqNeeded) ||
     r.rA === 0n ||
     r.rB === 0n ||
     !selected;
 	
   const needsLpApproval =
     liqNeeded > 0n &&
-    ((lpAllowance as bigint ?? 0n) < liqNeeded) &&
+    ((lpAllowance != null ? (lpAllowance as unknown as bigint) : 0n) < liqNeeded) &&
     !lpRecentlyApproved;
 
   const { data: balA_erc20 } = useReadContract({

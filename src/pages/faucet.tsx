@@ -10,7 +10,6 @@ import { ADDR } from "../lib/constants"
 const faucetAbi = (faucetArtifact as any).abi ?? (faucetArtifact as any)
 const tokenAbi = (tokenArtifact as any).abi ?? (tokenArtifact as any)
 
-const CHAIN_ID = Number(import.meta.env.VITE_CHAIN_ID || 0)
 const ok = (a?: string) => typeof a === "string" && /^0x[a-fA-F0-9]{40}$/.test(a)
 const fmtLeft = (s: number) =>
   s <= 0 ? "ready" : `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m ${Math.floor(s % 60)}s`
