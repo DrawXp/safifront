@@ -252,7 +252,7 @@ export default function SafidoPrize() {
   const [extrasLoading, setExtrasLoading] = useState(false)
 
   useEffect(() => {
-    if (!publicClient || lastId <= 0 || !isWinner || lastClaimed) {
+    if (lastId <= 0 || !isWinner || lastClaimed) {
       setExtraPrizesHuman([])
       setExtrasLoading(false)
       return
@@ -261,6 +261,11 @@ export default function SafidoPrize() {
     let cancelled = false
 
     async function loadExtras() {
+      if (!publicClient) {
+        setExtrasLoading(false)
+        return
+      }
+
       setExtrasLoading(true)
       try {
         const res = (await publicClient.readContract({
@@ -269,7 +274,7 @@ export default function SafidoPrize() {
           functionName: "viewRoundExtras",
           args: [BigInt(lastId)],
         })) as any
-
+		
         const tokens: `0x${string}`[] = (res?.tokens ?? res?.[0] ?? []) as `0x${string}`[]
         const amounts: bigint[] = (res?.amounts ?? res?.[1] ?? []) as bigint[]
 
@@ -294,11 +299,13 @@ export default function SafidoPrize() {
                 address: token,
                 abi: ERC20Abi,
                 functionName: "symbol",
+                args: [],
               }) as Promise<string>,
               publicClient.readContract({
                 address: token,
                 abi: ERC20Abi,
                 functionName: "decimals",
+                args: [],
               }) as Promise<number | bigint>,
             ])
 
@@ -329,6 +336,11 @@ export default function SafidoPrize() {
 
   async function claimLottery() {
     if (!address || !canClaimLottery) return
+    if (!publicClient) {
+      toast.error("Network not ready")
+      return
+    }
+
     try {
       const { request } = await publicClient.simulateContract({
         account: address,
@@ -374,7 +386,10 @@ export default function SafidoPrize() {
   const [qty, setQty] = useState("1")
   const qtyInt = Math.max(0, Number(qty || 0)) | 0
   const totalCost = useMemo(() => priceWei * BigInt(qtyInt), [priceWei, qtyInt])
-  const needApprove = useMemo(() => (allowance ?? 0n) < totalCost, [allowance, totalCost])
+  const needApprove = useMemo(() => {
+    const a = (allowance ?? 0n) as unknown as bigint
+    return a < totalCost
+  }, [allowance, totalCost])
 
   async function approveTickets() {
     if (!ticket) return

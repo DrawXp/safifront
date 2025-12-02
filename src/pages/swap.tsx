@@ -145,11 +145,13 @@ export default function Swap() {
         const k0 = p.token0.toLowerCase()
         const k1 = p.token1.toLowerCase()
 
+        const pAny = p as any
+
         if (!nextCatalog[k0]) {
           const sym0 =
             p.symbol0 && p.symbol0.trim().length ? p.symbol0 : shortAddr(k0)
           const dec0 =
-            typeof p.decimals0 === "number" ? p.decimals0 : 18
+            typeof pAny.decimals0 === "number" ? pAny.decimals0 : 18
           nextCatalog[k0] = {
             addr: p.token0 as `0x${string}`,
             sym: sym0,
@@ -161,7 +163,7 @@ export default function Swap() {
           const sym1 =
             p.symbol1 && p.symbol1.trim().length ? p.symbol1 : shortAddr(k1)
           const dec1 =
-            typeof p.decimals1 === "number" ? p.decimals1 : 18
+            typeof pAny.decimals1 === "number" ? pAny.decimals1 : 18
           nextCatalog[k1] = {
             addr: p.token1 as `0x${string}`,
             sym: sym1,
@@ -177,40 +179,46 @@ export default function Swap() {
     } catch {}
   }, [])
 
-  async function fetchMeta(addr: `0x${string}`): Promise<TokenMeta> {
-    try {
-      const [sym, name, dec] = await Promise.all([
-        pub
-          .readContract({
-            abi: ERC20Abi,
-            address: addr,
-            functionName: "symbol",
-          })
-          .catch(() => null),
-        pub
-          .readContract({
-            abi: ERC20Abi,
-            address: addr,
-            functionName: "name",
-          })
-          .catch(() => null),
-        pub
-          .readContract({
-            abi: ERC20Abi,
-            address: addr,
-            functionName: "decimals",
-          })
-          .catch(() => 18),
-      ])
-      let s = (sym ?? "").toString().trim()
-      if (!s) s = (name ?? "").toString().trim()
-      if (!s) s = shortAddr(addr)
-      if (s.length > 16) s = s.slice(0, 16)
-      return { addr, sym: s, dec: Number(dec ?? 18) }
-    } catch {
-      return { addr, sym: shortAddr(addr), dec: 18 }
-    }
+async function fetchMeta(addr: `0x${string}`): Promise<TokenMeta> {
+  const client = pub
+  if (!client) return { addr, sym: shortAddr(addr), dec: 18 }
+
+  try {
+    const [sym, name, dec] = await Promise.all([
+      client
+        .readContract({
+          abi: ERC20Abi,
+          address: addr,
+          functionName: "symbol",
+          args: [],
+        })
+        .catch(() => null),
+      client
+        .readContract({
+          abi: ERC20Abi,
+          address: addr,
+          functionName: "name",
+          args: [],
+        })
+        .catch(() => null),
+      client
+        .readContract({
+          abi: ERC20Abi,
+          address: addr,
+          functionName: "decimals",
+          args: [],
+        })
+        .catch(() => 18),
+    ])
+    let s = (sym ?? "").toString().trim()
+    if (!s) s = (name ?? "").toString().trim()
+    if (!s) s = shortAddr(addr)
+    if (s.length > 16) s = s.slice(0, 16)
+    return { addr, sym: s, dec: Number(dec ?? 18) }
+  } catch {
+    return { addr, sym: shortAddr(addr), dec: 18 }
   }
+}
 
   useEffect(() => {
     let alive = true
@@ -1125,7 +1133,10 @@ export default function Swap() {
         return "0"
       }
     }
-    const v = (ercBalBn as bigint) ?? 0n
+
+    const raw = ercBalBn as unknown
+    const v = typeof raw === "bigint" ? raw : 0n
+
     try {
       return fixedDown(formatUnits(v, fromDec), 8)
     } catch {

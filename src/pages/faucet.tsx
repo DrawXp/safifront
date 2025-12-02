@@ -149,11 +149,15 @@ export default function Faucet() {
       return
     }
     if (secondsLeft > 0) return
+    if (!publicClient) {
+      toast.error("Network not ready")
+      return
+    }
 
     setTxPending(true)
     try {
       const tx = (await wallet.writeContract({
-        chain: { id: CHAIN_ID },
+        chain: publicClient.chain,
         address: ADDR.faucet as `0x${string}`,
         abi: faucetAbi,
         functionName: "claim",
@@ -176,7 +180,7 @@ export default function Faucet() {
     <div className="page-card space-y-4">
       <div className="w-full max-w-md mx-auto">
         <div className="panel-card space-y-4 text-center">
-          <h3 className="text-xl font-semibold">Receive SAFI</h3>
+          <h3 className="text-xl font-semibold">Receive SAFI daily</h3>
           <div className="flex flex-col items-center gap-3">
             <button
               onClick={claim}

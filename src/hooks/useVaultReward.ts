@@ -22,10 +22,13 @@ export function useVaultReward() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const contract = useMemo(() => ({
-    address: VAULT_REWARD,
-    abi: vaultRewardAbi as const,
-  }), [])
+  const contract = useMemo(
+    () => ({
+      address: VAULT_REWARD,
+      abi: vaultRewardAbi,
+    }),
+    []
+  )
 
   useEffect(() => {
     console.debug('[VR env]', { CHAIN_ID, VAULT_REWARD })
@@ -35,22 +38,32 @@ export function useVaultReward() {
     if (!publicClient || !address) return
     setError(null)
     try {
-      const lp = await publicClient.readContract({
-        ...contract, functionName: 'lastPaidDay', args: []
-      }) as bigint
+      const lp = (await publicClient.readContract({
+        ...contract,
+        functionName: 'lastPaidDay',
+        args: [],
+      })) as bigint
       setLastPaid(lp)
 
-      const w = await publicClient.readContract({
-        ...contract, functionName: 'winnerOfDay', args: [lp]
-      }) as Address
+      const w = (await publicClient.readContract({
+        ...contract,
+        functionName: 'winnerOfDay',
+        args: [lp],
+      })) as Address
       setWinner(w)
 
       let pend: bigint = 0n
       try {
-        pend = await publicClient.readContract({
-          ...contract, functionName: 'pending', args: [address as Address],
-        }) as bigint
-        console.debug('[VR read] pending()', { user: address, chain: CHAIN_ID, value: pend.toString() })
+        pend = (await publicClient.readContract({
+          ...contract,
+          functionName: 'pending',
+          args: [address as Address],
+        })) as bigint
+        console.debug('[VR read] pending()', {
+          user: address,
+          chain: CHAIN_ID,
+          value: pend.toString(),
+        })
       } catch (e: any) {
         console.warn('[VR read] pending() falhou, seguindo fallback', e?.message ?? e)
       }
@@ -62,9 +75,11 @@ export function useVaultReward() {
       if (!can && w && address && w.toLowerCase() === (address as Address).toLowerCase()) {
         can = true
         try {
-          const units = await publicClient.readContract({
-            ...contract, functionName: 'rewardUnits', args: []
-          }) as bigint
+          const units = (await publicClient.readContract({
+            ...contract,
+            functionName: 'rewardUnits',
+            args: [],
+          })) as bigint
           hint = units
         } catch {}
       }
@@ -73,14 +88,18 @@ export function useVaultReward() {
         try {
           await publicClient.simulateContract({
             account: address as Address,
-            ...contract, functionName: 'claim', args: []
+            ...contract,
+            functionName: 'claim',
+            args: [],
           })
           can = true
           if (hint === null) {
             try {
-              const units = await publicClient.readContract({
-                ...contract, functionName: 'rewardUnits', args: []
-              }) as bigint
+              const units = (await publicClient.readContract({
+                ...contract,
+                functionName: 'rewardUnits',
+                args: [],
+              })) as bigint
               hint = units
             } catch {}
           }
@@ -121,8 +140,11 @@ export function useVaultReward() {
       setLoading(true)
       console.debug('[VR write] claim...')
       const hash = await walletClient.writeContract({
-        ...contract, functionName: 'claim', args: [],
-        account: address as Address, chain: publicClient?.chain,
+        ...contract,
+        functionName: 'claim',
+        args: [],
+        account: address as Address,
+        chain: publicClient?.chain,
       })
       await publicClient!.waitForTransactionReceipt({ hash })
       await refresh()
@@ -136,11 +158,11 @@ export function useVaultReward() {
   }, [address, walletClient, chainId, switchChainAsync, contract, publicClient, refresh])
 
   return {
-    pending,            
-    claimable,          
-    amountHint,         
-    lastPaid,           
-    winner,             
+    pending,
+    claimable,
+    amountHint,
+    lastPaid,
+    winner,
     isClaiming: loading,
     error,
     claim,

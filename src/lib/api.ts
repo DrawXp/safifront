@@ -39,6 +39,8 @@ export type DexPairSnapshot = {
   totalSupply: string
   symbol0?: string
   symbol1?: string
+  decimals0?: number
+  decimals1?: number
 }
 
 export type DexPairsResponse = {
@@ -50,6 +52,7 @@ export const api = {
 
   dexApr: (pair: `0x${string}`) =>
     getJson<DexAprResponse>(`/dex/apr?pair=${pair}`),
+
   dexPairs: () =>
     getJson<DexPairsResponse>(`/dex/pairs`),
 

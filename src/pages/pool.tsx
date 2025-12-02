@@ -103,11 +103,13 @@ export default function Pool() {
 
   async function loadSymbol(addr: `0x${string}`): Promise<string> {
     if (!addr) return "UNK";
+    if (!pub) return labelToken(addr, "UNK");
     try {
       const sym = (await pub.readContract({
         abi: ERC20Abi,
         address: addr,
         functionName: "symbol",
+        args: [],
       })) as string;
       return labelToken(addr, String(sym || "").trim() || "UNK");
     } catch {
@@ -116,6 +118,7 @@ export default function Pool() {
           abi: ERC20Abi,
           address: addr,
           functionName: "name",
+          args: [],
         })) as string;
         return labelToken(addr, String(nm || "").trim() || "UNK");
       } catch {
@@ -601,8 +604,8 @@ async function approveLP() {
     if (!lpBal || !totalSupply || r.rA === 0n || r.rB === 0n) {
       return { a: "0", b: "0" };
     }
-    const lp = lpBal as bigint;
-    const ts = totalSupply as bigint;
+    const lp = lpBal as unknown as bigint;
+    const ts = totalSupply as unknown as bigint;
     const aOut = (r.rA * lp) / ts;
     const bOut = (r.rB * lp) / ts;
     return {
@@ -633,14 +636,14 @@ async function approveLP() {
     [r.rB, decB],
   );
   const lpHuman = useMemo(
-    () => (lpBal ? fixedDown(formatUnits(lpBal as bigint, 18), 8) : "0"),
+    () => (lpBal ? fixedDown(formatUnits(lpBal as unknown as bigint, 18), 8) : "0"),
     [lpBal],
   );
   const sharePct = useMemo(() => {
     if (!lpBal || !totalSupply) return "0.000000";
     const P = 1_000_000n;
     const pctScaled =
-      ((lpBal as bigint) * 100n * P) / (totalSupply as bigint);
+      ((lpBal as unknown as bigint) * 100n * P) / (totalSupply as unknown as bigint);
     return (Number(pctScaled) / 1_000_000).toFixed(6);
   }, [lpBal, totalSupply]);
 
@@ -673,30 +676,30 @@ async function approveLP() {
     args: address && tokenB ? [address] : undefined,
     query: { enabled: !!address && !!tokenB },
   });
-	const [phrsBal, setPhrsBal] = useState<bigint>(0n);
-	useEffect(() => {
-	  let cancelled = false;
+  const [phrsBal, setPhrsBal] = useState<bigint>(0n);
+  useEffect(() => {
+    let cancelled = false;
 
-	  if (!address) {
-		setPhrsBal(0n);
-		return () => {
-		  cancelled = true;
-		};
-	  }
+    if (!address || !pub) {
+      setPhrsBal(0n);
+      return () => {
+        cancelled = true;
+      };
+    }
 
-	  pub
-		.getBalance({ address })
-		.then((v) => {
-		  if (!cancelled) setPhrsBal(v);
-		})
-		.catch(() => {
-		  if (!cancelled) setPhrsBal(0n);
-		});
+    pub
+      .getBalance({ address })
+      .then((v) => {
+        if (!cancelled) setPhrsBal(v);
+      })
+      .catch(() => {
+        if (!cancelled) setPhrsBal(0n);
+      });
 
-	  return () => {
-		cancelled = true;
-	  };
-	}, [address, selected, pub]);
+    return () => {
+      cancelled = true;
+    };
+  }, [address, selected, pub]);
 
   const balAHuman = useMemo(() => {
     if (
@@ -705,7 +708,7 @@ async function approveLP() {
     )
       return fixedDown(formatUnits(phrsBal, 18), 8);
     return balA_erc20 != null
-      ? fixedDown(formatUnits(balA_erc20 as bigint, decA), 8)
+      ? fixedDown(formatUnits(balA_erc20 as unknown as bigint, decA), 8)
       : "0";
   }, [tokenA, phrsBal, balA_erc20, decA]);
   const balBHuman = useMemo(() => {
@@ -715,7 +718,7 @@ async function approveLP() {
     )
       return fixedDown(formatUnits(phrsBal, 18), 8);
     return balB_erc20 != null
-      ? fixedDown(formatUnits(balB_erc20 as bigint, decB), 8)
+      ? fixedDown(formatUnits(balB_erc20 as unknown as bigint, decB), 8)
       : "0";
   }, [tokenB, phrsBal, balB_erc20, decB]);
 
@@ -727,6 +730,7 @@ async function approveLP() {
   useEffect(() => {
     setMetaB(null);
     if (!newB || !newB.startsWith("0x") || newB.length !== 42) return;
+    if (!pub) return;
     const addr = newB as `0x${string}`;
     (async () => {
       try {
@@ -737,6 +741,7 @@ async function approveLP() {
               abi: ERC20Abi,
               address: addr,
               functionName: "decimals",
+              args: [],
             })
             .catch(() => 18),
         ]);
@@ -746,11 +751,6 @@ async function approveLP() {
       }
     })();
   }, [newB, pub]);
-
-  const showB = useMemo(
-    () => metaB?.sym ?? (newB ? "UNK" : "0x..."),
-    [metaB, newB],
-  );
 
   function sort2(a: string, b: string): [string, string] {
     return a.toLowerCase() < b.toLowerCase() ? [a, b] : [b, a];
@@ -771,6 +771,10 @@ async function approveLP() {
 
   async function createAndSeedPair() {
     if (!factoryAddr || !newB) return;
+    if (!pub) {
+      toast.error("Network not ready");
+      return;
+    }
     if (newB.toLowerCase() === ADDR.wphrs?.toLowerCase()) {
       toast.error("Token B cannot be PHRS");
       return;
@@ -837,6 +841,10 @@ async function approveLP() {
 async function addLiquidity() {
   if (!selected || !ADDR.router || !address) return;
   if (aAmt === 0n || bAmt === 0n) return;
+  if (!pub) {
+    toast.error("Network not ready");
+    return;
+  }
 
   try {
     const [t0, t1] = [selected.t0, selected.t1];
@@ -886,6 +894,10 @@ async function addLiquidity() {
 async function removeLiquidity() {
   if (!selected || !ADDR.router || !address) return;
   if (liqNeeded === 0n) return;
+  if (!pub) {
+    toast.error("Network not ready");
+    return;
+  }
 
   try {
     const [t0, t1] = [selected.t0, selected.t1];

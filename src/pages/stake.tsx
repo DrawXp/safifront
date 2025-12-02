@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState, useRef } from "react"
-import {  useAccount,  useReadContract,  useReadContracts,  useWalletClient,  usePublicClient,} from "wagmi"
+import {
+  useAccount,
+  useReadContract,
+  useReadContracts,
+  useWalletClient,
+  usePublicClient,
+  type Chain
+} from "wagmi"
 import { parseUnits, formatUnits, type Hex } from "viem"
 import toast from "react-hot-toast"
 
@@ -9,12 +16,33 @@ import vaultArtifact from "../abis/SAFIVault.json"
 import { api } from "../lib/api"
 import { ADDR } from "../lib/constants"
 
-const tokenAbi = (tokenArtifact as any).abi ?? (tokenArtifact as any)
-const stakingAbi = (stakingArtifact as any).abi ?? (stakingArtifact as any)
-const vaultAbi = (vaultArtifact as any).abi ?? (vaultArtifact as any)
+const tokenAbi = (tokenArtifact as any).abi ?? tokenArtifact
+const stakingAbi = (stakingArtifact as any).abi ?? stakingArtifact
+const vaultAbi = (vaultArtifact as any).abi ?? vaultArtifact
 
 const CHAIN_ID = Number(import.meta.env.VITE_CHAIN_ID || 0)
-const ok = (a?: string) => typeof a === "string" && /^0x[a-fA-F0-9]{40}$/.test(a)
+
+const pharosChain: Chain = {
+  id: CHAIN_ID,
+  name: 'Pharos Atlantic',
+  nativeCurrency: {
+    name: 'Pharos',
+    symbol: 'PHRS',
+    decimals: 18
+  },
+  rpcUrls: {
+    default: { http: ['https://atlantic.dplabs-internal.com'] },
+    public: { http: ['https://atlantic.dplabs-internal.com'] }
+  },
+  blockExplorers: {
+    default: { name: 'PharosScan', url: 'https://atlantic.pharosscan.xyz' }
+  },
+  testnet: true
+}
+
+const ok = (a?: string) =>
+  typeof a === "string" && /^0x[a-fA-F0-9]{40}$/.test(a)
+
 const fmtLeft = (s: number) =>
   s <= 0 ? "ready" : `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m ${Math.floor(s % 60)}s`
 
@@ -303,6 +331,7 @@ export default function Stake() {
         address: ADDR.vault as `0x${string}`,
         abi: vaultAbi,
         functionName: "run",
+        args: [],
       })
       .then((r) => setReqRun(r.request))
       .catch(() => setReqRun(undefined))
@@ -319,6 +348,7 @@ export default function Stake() {
         address: ADDR.staking as `0x${string}`,
         abi: stakingAbi,
         functionName: "claim",
+        args: [],
       })
       .then((r) => setReqClaim(r.request))
       .catch(() => setReqClaim(undefined))
@@ -335,6 +365,7 @@ export default function Stake() {
         address: ADDR.staking as `0x${string}`,
         abi: stakingAbi,
         functionName: "claimAndStake",
+        args: [],
       })
       .then((r) => setReqClaimStake(r.request))
       .catch(() => setReqClaimStake(undefined))
@@ -410,13 +441,13 @@ export default function Stake() {
   async function doRun() {
     if (!wallet || !ok(ADDR.vault)) return alert("Connect wallet")
     try {
-      const hash = (await wallet.writeContract({
-        chain: { id: CHAIN_ID },
-        address: ADDR.vault as `0x${string}`,
-        abi: vaultAbi,
-        functionName: "run",
-        args: [],
-      })) as Hex
+		const hash = (await wallet.writeContract({
+		  chain: pharosChain,
+		  address: ADDR.vault as `0x${string}`,
+		  abi: vaultAbi,
+		  functionName: "run",
+		  args: [],
+		})) as Hex
       waitByBlocks(hash)
       showTxToast(hash)
       api.bountyHint(hash).catch(() => {})
@@ -435,7 +466,7 @@ export default function Stake() {
       try {
         setIsApproving(true)
         const hash = (await wallet.writeContract({
-          chain: { id: CHAIN_ID },
+          chain: pharosChain,
           address: ADDR.token as `0x${string}`,
           abi: tokenAbi,
           functionName: "approve",
@@ -456,7 +487,7 @@ export default function Stake() {
     }
 
     const hash = (await wallet.writeContract({
-      chain: { id: CHAIN_ID },
+      chain: pharosChain,
       address: ADDR.staking as `0x${string}`,
       abi: stakingAbi,
       functionName: "stake",
@@ -469,7 +500,7 @@ export default function Stake() {
   async function doClaim() {
     if (!wallet || !ok(ADDR.staking)) return alert("Connect wallet")
     const hash = (await wallet.writeContract({
-      chain: { id: CHAIN_ID },
+      chain: pharosChain,
       address: ADDR.staking as `0x${string}`,
       abi: stakingAbi,
       functionName: "claim",
@@ -482,7 +513,7 @@ export default function Stake() {
   async function doClaimAndStake() {
     if (!wallet || !ok(ADDR.staking)) return alert("Connect wallet")
     const hash = (await wallet.writeContract({
-      chain: { id: CHAIN_ID },
+      chain: pharosChain,
       address: ADDR.staking as `0x${string}`,
       abi: stakingAbi,
       functionName: "claimAndStake",
@@ -497,7 +528,7 @@ export default function Stake() {
     const need = wantUnstake
     if (need <= 0n) return
     const hash = (await wallet.writeContract({
-      chain: { id: CHAIN_ID },
+      chain: pharosChain,
       address: ADDR.staking as `0x${string}`,
       abi: stakingAbi,
       functionName: "unstake",
