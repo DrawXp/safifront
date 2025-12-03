@@ -18,18 +18,6 @@ async function postJson<T = any>(path: string, body: unknown): Promise<T> {
   return r.json() as Promise<T>
 }
 
-export type DexAprResponse = {
-  pair: `0x${string}`
-  day: string
-  lpFeeBps: number
-  apr: number
-  fee0: string
-  fee1: string
-  reserve0: string
-  reserve1: string
-  txCount: number
-}
-
 export type DexPairSnapshot = {
   pair: string
   token0: string
@@ -49,9 +37,6 @@ export type DexPairsResponse = {
 
 export const api = {
   health: () => getJson(`/health`),
-
-  dexApr: (pair: `0x${string}`) =>
-    getJson<DexAprResponse>(`/dex/apr?pair=${pair}`),
 
   dexPairs: () =>
     getJson<DexPairsResponse>(`/dex/pairs`),

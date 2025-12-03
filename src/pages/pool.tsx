@@ -6,7 +6,6 @@ import toast from "react-hot-toast";
 import RouterJson from "../abis/Router.json";
 import ERC20Json from "../abis/ERC20.json";
 import PairJson   from "../abis/Pair.json";
-import { api } from "../lib/api";
 import { ADDR } from "../lib/constants";
 
 
@@ -147,9 +146,9 @@ async function loadPairs(mounted?: { current: boolean }): Promise<PairItem[]> {
   if (mounted && !mounted.current) return [];
   setLoadingPairs(true);
   try {
-    const res = await api.dexPairs();
+    const response = await fetch(`${BACKEND_URL}/dex/pairs`);
+    const res = await response.json();
     if (mounted && !mounted.current) return [];
-
     const snaps = (res.pairs ?? []) as any[];
     if (!snaps.length) {
       if (!mounted || mounted.current) {
