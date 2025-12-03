@@ -26,8 +26,9 @@ export default function App() {
       />
 
       <header className="nav-bar h-16 px-4 flex items-center justify-between gap-4 sticky top-0 z-50 backdrop-blur-md bg-black/20 border-b border-white/10">
-        <div className="flex-1 overflow-x-auto no-scrollbar">
-          <nav className="nav-list flex items-center gap-2 pr-4">
+        
+        <div className="flex-1 flex items-center justify-start md:justify-center overflow-x-auto no-scrollbar mask-gradient">
+          <nav className="nav-list flex items-center gap-2 pr-4 md:pr-0">
             <NavLink to="/"            className={tabClass}>Home</NavLink>
             <NavLink to="/swap"        className={tabClass}>Swap</NavLink>
             <NavLink to="/pool"        className={tabClass}>Pool</NavLink>
