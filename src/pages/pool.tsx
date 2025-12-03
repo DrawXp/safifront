@@ -8,6 +8,7 @@ import ERC20Json from "../abis/ERC20.json";
 import PairJson   from "../abis/Pair.json";
 import { ADDR } from "../lib/constants";
 
+const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL as string || "http://localhost:3001").replace(/\/$/, "");
 
 const RouterAbi: any[] = (RouterJson as any).abi ?? (RouterJson as any);
 const ERC20Abi:  any[] = (ERC20Json  as any).abi ?? (ERC20Json  as any);
