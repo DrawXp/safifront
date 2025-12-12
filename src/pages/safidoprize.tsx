@@ -386,7 +386,8 @@ export default function SafidoPrize() {
   const qtyInt = Math.max(0, Number(qty || 0)) | 0
   const totalCost = useMemo(() => priceWei * BigInt(qtyInt), [priceWei, qtyInt])
   const needApprove = useMemo(() => {
-    const a = (allowance ?? 0n) as unknown as bigint
+    if (allowance === undefined) return false
+    const a = allowance as unknown as bigint
     return a < totalCost
   }, [allowance, totalCost])
 
