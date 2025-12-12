@@ -86,6 +86,41 @@ export default function Home() {
           </Link>
         ))}
       </div>
+
+      <div className="panel-card mt-12 flex flex-col md:flex-row items-center justify-between gap-4 text-neutral-300">
+        <div className="font-medium tracking-wide text-sm text-center md:text-left">
+          © 2025 SafidoSwap. All rights reserved.
+        </div>
+
+        <div className="flex items-center gap-6">
+          <a
+            href="https://x.com/safidoswap"
+            target="_blank"
+            rel="noreferrer"
+            className="group flex items-center gap-2 hover:text-white transition-colors"
+          >
+            <div className="p-2 rounded-full bg-white/5 group-hover:bg-white/10 border border-transparent group-hover:border-white/20 transition-all">
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-current">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+              </svg>
+            </div>
+            <span className="text-sm font-semibold hidden sm:block">Get Updated</span>
+          </a>
+
+          <a
+            href="mailto:safidoswap@gmail.com"
+            className="group flex items-center gap-2 hover:text-white transition-colors"
+          >
+            <div className="p-2 rounded-full bg-white/5 group-hover:bg-white/10 border border-transparent group-hover:border-white/20 transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
+                <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
+              </svg>
+            </div>
+            <span className="text-sm font-semibold hidden sm:block">Contact Us</span>
+          </a>
+        </div>
+      </div>
     </section>
   )
 }
