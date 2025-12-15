@@ -46,8 +46,8 @@ function getAmountOutUniV2(
   reserveOut: bigint,
 ): bigint {
   if (amountIn <= 0n || reserveIn <= 0n || reserveOut <= 0n) return 0n
-  const feeNum = 997n
-  const feeDen = 1000n
+  const feeNum = 9985n
+  const feeDen = 10000n
   const amountInWithFee = amountIn * feeNum
   const num = amountInWithFee * reserveOut
   const den = reserveIn * feeDen + amountInWithFee
