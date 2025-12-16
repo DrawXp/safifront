@@ -2,7 +2,7 @@ import { Outlet, NavLink } from 'react-router-dom'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useAccount, useSwitchChain } from 'wagmi'
 import { Toaster } from 'react-hot-toast'
-import Footer from './components/footer'
+import Footer from './components/Footer'
 
 const CHAIN_ID = Number(import.meta.env.VITE_CHAIN_ID || 0)
 
@@ -26,9 +26,9 @@ export default function App() {
         }}
       />
 
-      <header className="nav-bar h-16 px-4 flex items-center justify-between gap-4 sticky top-0 z-50 backdrop-blur-md bg-black/20 border-b border-white/10">
+      <header className="nav-bar h-16 px-4 flex items-center relative sticky top-0 z-50 backdrop-blur-md bg-black/20 border-b border-white/10">
         
-        <div className="flex-1 flex items-center justify-start md:justify-center overflow-x-auto no-scrollbar mask-gradient">
+        <div className="flex-1 md:flex-none flex items-center justify-start overflow-x-auto no-scrollbar mask-gradient md:absolute md:left-1/2 md:-translate-x-1/2">
           <nav className="nav-list flex items-center gap-2 pr-4 md:pr-0">
             <NavLink to="/"            className={tabClass}>Home</NavLink>
             <NavLink to="/swap"        className={tabClass}>Swap</NavLink>
@@ -39,7 +39,7 @@ export default function App() {
           </nav>
         </div>
 
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 ml-auto relative z-10">
           <ConnectButton.Custom>
             {({
               account,
