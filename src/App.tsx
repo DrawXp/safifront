@@ -2,6 +2,7 @@ import { Outlet, NavLink } from 'react-router-dom'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useAccount, useSwitchChain } from 'wagmi'
 import { Toaster } from 'react-hot-toast'
+import Footer from './components/Footer'
 
 const CHAIN_ID = Number(import.meta.env.VITE_CHAIN_ID || 0)
 
@@ -115,6 +116,8 @@ export default function App() {
           <Outlet />
         </div>
       </main>
+
+      <Footer />
     </div>
   )
 }
