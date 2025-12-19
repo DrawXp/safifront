@@ -955,7 +955,7 @@ async function removeLiquidity() {
     <div className="page-card space-y-6">
       <div className="w-full max-w-md mx-auto space-y-4">
 <div className="panel-card space-y-4">
-  <div className="flex items-start justify-between gap-3">
+  <div className="flex items-center justify-between gap-3">
     <div className="flex flex-col gap-1">
       <div className="toggle-group">
         <button

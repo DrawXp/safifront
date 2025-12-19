@@ -96,6 +96,8 @@ export default function SafidoPrize() {
   const { pending, claim, claimable, refresh: refreshVaultReward } = useVaultReward()
 
   const pendingWei = (pending as bigint) ?? 0n
+  // Mantemos o pendingHuman pois pode ser útil no futuro, 
+  // mas removemos a exibição visual dele no painel inferior.
   const pendingHuman = useMemo(() => {
     const n = Number(formatUnits(pendingWei, 18))
     return n.toLocaleString("en-US", { maximumFractionDigits: 7 })
@@ -429,8 +431,77 @@ export default function SafidoPrize() {
     } catch {}
   }
 
+  const [showClaimMenu, setShowClaimMenu] = useState(false)
+  const hasAnyClaim = canClaimLottery || canClaimReward
+
   return (
-    <div className="page-card space-y-4">
+    <div className="page-card space-y-4 relative">
+      <div className="absolute -top-5 -left-4 z-50">
+        <button
+          type="button"
+          onClick={() => hasAnyClaim && setShowClaimMenu(!showClaimMenu)}
+          disabled={!hasAnyClaim}
+          className={`p-3 rounded-full shadow-xl border transition-all duration-300 ${
+            hasAnyClaim
+              ? "bg-slate-900 border-[var(--primary)] text-yellow-400 cursor-pointer hover:scale-110 shadow-[0_0_15px_rgba(250,204,21,0.4)]"
+              : "bg-slate-900/80 border-white/10 text-gray-600 cursor-not-allowed"
+          }`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className={`w-6 h-6 ${hasAnyClaim ? "animate-pulse" : ""}`}
+          >
+            <path
+              fillRule="evenodd"
+              d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 104.496 0 25.057 25.057 0 01-4.496 0z"
+              clipRule="evenodd"
+            />
+          </svg>
+          {hasAnyClaim && (
+            <span className="absolute top-0 right-0 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+            </span>
+          )}
+        </button>
+
+        {showClaimMenu && hasAnyClaim && (
+          <div className="absolute top-14 left-0 w-64 flex flex-col gap-2 p-3 bg-slate-900/95 border border-zinc-500 rounded-xl shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-top-2">
+            {canClaimLottery && (
+              <button
+                onClick={() => {
+                  claimLottery()
+                  setShowClaimMenu(false)
+                }}
+                disabled={isPending}
+                className="btn-rgb text-xs py-2 shadow-lg"
+              >
+                Claim Lottery Prize
+              </button>
+            )}
+            {canClaimReward && (
+              <button
+                onClick={() => {
+                  claimRunnerReward()
+                  setShowClaimMenu(false)
+                }}
+                disabled={isPending}
+                className="btn-rgb text-xs py-2 shadow-lg"
+              >
+                Claim Distribution Prize
+              </button>
+            )}
+            {!canClaimLottery && !canClaimReward && (
+              <div className="text-xs text-center text-gray-400 py-1">
+                Nothing to claim
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       <div className="w-full max-w-md mx-auto space-y-4">
         <div className="panel-card space-y-4 text-center">
           <h4 className="text-lg font-semibold">
@@ -483,19 +554,6 @@ export default function SafidoPrize() {
                 }
                 placeholder="0"
               />
-
-              <button
-                onClick={claimLottery}
-                className={
-                  canClaimLottery && !isPending
-                    ? "btn-rgb w-auto px-6"
-                    : "btn-primary-wip w-auto px-6"
-                }
-                disabled={!canClaimLottery || isPending}
-                title={canClaimLottery ? "" : expired ? "Expired on-chain" : "Not eligible"}
-              >
-                Claim prize
-              </button>
             </div>
 
             <div className="text-xs text-center pl-4">
@@ -557,25 +615,7 @@ export default function SafidoPrize() {
             <div>Claim deadline: {toDateTime(lastDeadline)}</div>
           </section>
         </div>
-
-        <div className="panel-card space-y-4 text-center">
-          <h3 className="text-xl font-semibold">Distribution Prize</h3>
-          <p>Your pending Reward: {pendingHuman} SAFI</p>
-          <button
-            onClick={claimRunnerReward}
-            className={
-              canClaimReward && !isPending
-                ? "btn-primary w-auto mx-auto block"
-                : "btn-primary-wip w-auto mx-auto block"
-            }
-            disabled={!canClaimReward || isPending}
-            title={canClaimReward ? "" : "Not eligible"}
-          >
-            Claim
-          </button>
-        </div>
       </div>
     </div>
   )
 }
-
