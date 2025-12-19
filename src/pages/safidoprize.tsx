@@ -96,12 +96,7 @@ export default function SafidoPrize() {
   const { pending, claim, claimable, refresh: refreshVaultReward } = useVaultReward()
 
   const pendingWei = (pending as bigint) ?? 0n
-  // Mantemos o pendingHuman pois pode ser útil no futuro, 
-  // mas removemos a exibição visual dele no painel inferior.
-  const pendingHuman = useMemo(() => {
-    const n = Number(formatUnits(pendingWei, 18))
-    return n.toLocaleString("en-US", { maximumFractionDigits: 7 })
-  }, [pendingWei])
+  // A variável pendingHuman foi removida daqui pois não é mais utilizada na interface.
   
 	const [rewardJustClaimed, setRewardJustClaimed] = useState(false)
 	const canClaimReward = claimable && !rewardJustClaimed
