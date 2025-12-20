@@ -90,11 +90,13 @@ export default function Home() {
                   </p>
                 </div>
                 
-                <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/0 to-[var(--secondary)]/0 group-hover:from-[var(--primary)]/5 group-hover:to-[var(--secondary)]/10 transition-all duration-500" />
+                {/* Gradiente de hover mais sutil para combinar com a maior transparência */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/0 to-[var(--secondary)]/0 group-hover:from-[var(--primary)]/10 group-hover:to-[var(--secondary)]/20 transition-all duration-500" />
               </>
             )
 
-            const commonClasses = "group relative rounded-2xl border border-white/10 bg-slate-900/30 backdrop-blur-sm overflow-hidden p-8 hover:border-[var(--primary)] hover:shadow-[0_0_30px_rgba(var(--primary-rgb),0.2)] transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-start min-h-[260px]"
+            // Alterado: 'bg-slate-900/30 backdrop-blur-sm' para 'bg-black/10'
+            const commonClasses = "group relative rounded-2xl border border-white/10 bg-black/10 overflow-hidden p-8 hover:border-[var(--primary)] hover:shadow-[0_0_30px_rgba(var(--primary-rgb),0.2)] transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-start min-h-[260px]"
 
             if (card.external) {
               return (
