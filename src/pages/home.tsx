@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Swap from './swap'
 
@@ -27,10 +27,6 @@ const features = [
 ]
 
 export default function Home() {
-  // Estado mantido caso queira usar para alguma interação futura, 
-  // mas o efeito de glow foi removido.
-  const [hasInteracted, setHasInteracted] = useState(false)
-
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -66,11 +62,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div 
-          className="w-full max-w-md shrink-0 relative z-10"
-          onClick={() => setHasInteracted(true)}
-        >
-          {/* Glow effect div removed as requested */}
+        <div className="w-full max-w-md shrink-0 relative z-10">
           <Swap />
         </div>
       </section>
@@ -87,19 +79,8 @@ export default function Home() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {features.map((card) => {
-             const Wrapper = card.external ? 'a' : Link
-             const props = card.external ? { href: card.to, target: '_blank', rel: 'noopener noreferrer' } : { to: card.to }
-             
-             return (
-              <Wrapper
-                key={card.title}
-                {...props}
-                className="group relative rounded-2xl border border-white/10
-                           bg-slate-900/30 backdrop-blur-sm overflow-hidden p-8
-                           hover:border-[var(--primary)] hover:shadow-[0_0_30px_rgba(var(--primary-rgb),0.2)]
-                           transition-all duration-300 transform hover:-translate-y-1
-                           flex flex-col justify-start min-h-[260px]"
-              >
+            const cardContent = (
+              <>
                 <div className="relative z-10 space-y-4">
                   <h3 className="text-2xl font-extrabold text-neutral-100 group-hover:text-[var(--primary-tint)] transition-colors text-outline-black">
                     {card.title}
@@ -110,7 +91,33 @@ export default function Home() {
                 </div>
                 
                 <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/0 to-[var(--secondary)]/0 group-hover:from-[var(--primary)]/5 group-hover:to-[var(--secondary)]/10 transition-all duration-500" />
-              </Wrapper>
+              </>
+            )
+
+            const commonClasses = "group relative rounded-2xl border border-white/10 bg-slate-900/30 backdrop-blur-sm overflow-hidden p-8 hover:border-[var(--primary)] hover:shadow-[0_0_30px_rgba(var(--primary-rgb),0.2)] transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-start min-h-[260px]"
+
+            if (card.external) {
+              return (
+                <a
+                  key={card.title}
+                  href={card.to}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={commonClasses}
+                >
+                  {cardContent}
+                </a>
+              )
+            }
+
+            return (
+              <Link
+                key={card.title}
+                to={card.to}
+                className={commonClasses}
+              >
+                {cardContent}
+              </Link>
             )
           })}
         </div>
