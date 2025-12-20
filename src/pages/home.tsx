@@ -1,91 +1,120 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import Swap from './swap'
 
-const cards = [
-  {
-    to: '/swap',
-    title: 'Swap',
-    subtitle: 'Trade between your favorite pairs',
-    image: '/swap.webp',
-    alt: 'Swap mascot',
-  },
+const features = [
   {
     to: '/pool',
-    title: 'Pool',
-    subtitle: 'Create or provide liquidity to existing pools',
-    image: '/pool.webp',
-    alt: 'Pool mascot',
+    title: 'Liquidity Pools',
+    subtitle: 'Provide liquidity and benefit from our highly competitive 0.15% total trading fee. LPs automatically earn 0.10% of every swap volume proportional to their share, compounding their assets with every trade.',
   },
   {
     to: '/stake',
-    title: 'Stake',
-    subtitle: 'Stake to earn yield on your SAFI token',
-    image: '/stake.webp',
-    alt: 'Stake mascot',
+    title: 'Staking',
+    subtitle: 'Stake your SAFI tokens to capture value from the protocol\'s emission vault. Our sustainable exponential decay model ensures long-term rewards for holders, allowing you to earn passive yield without mandatory lock-up periods.',
   },
   {
     to: '/safidoprize',
     title: 'SafidoPrize',
-    subtitle: 'Try your luck in the Safido lottery',
-    image: '/safiluck.webp',
-    alt: 'SafidoPrize mascot',
+    subtitle: 'Participate in the verifiable on-chain lottery. The engine uses protocol revenue for automated buybacks and burns, driving deflationary pressure while offering snowball jackpots that roll over every 8 hours.',
   },
   {
-    to: '/faucet',
-    title: 'Faucet',
-    subtitle: 'Claim your daily SAFI Token',
-    image: '/faucet.webp',
-    alt: 'Faucet mascot',
+    to: 'https://docs.safidoswap.xyz',
+    title: 'Documentation',
+    subtitle: 'Explore the comprehensive developer reference and architectural guides. Dive into the AMM mathematics, smart contract integrations, and the tokenomics models that power the SafidoSwap ecosystem.',
+    external: true
   },
 ]
 
 export default function Home() {
+  // Estado mantido caso queira usar para alguma interação futura, 
+  // mas o efeito de glow foi removido.
+  const [hasInteracted, setHasInteracted] = useState(false)
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   return (
-    <section className="py-8">
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-2">
-          <span className="bg-gradient-to-r from-[var(--primary)] via-[var(--secondary)] to-[var(--primary-tint)] bg-clip-text text-transparent">
-            SafidoSwap
-          </span>
-        </h1>
-        <p className="text-sm md:text-base text-slate-200">
-          <span className="text-[var(--primary-tint)] font-semibold">
-            Trade the waves
-          </span>
-          <span className="mx-1">,</span>
-          <span className="text-[var(--secondary-tint)] font-semibold">
-            crave the gains
-          </span>
-        </p>
-      </div>
+    <div className="flex flex-col gap-16 py-8">
+      <section className="flex flex-col lg:flex-row items-start justify-center gap-12 px-4">
+        <div className="flex-1 max-w-xl text-center lg:text-left lg:pt-[7.5rem]">
+          <div>
+            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-2 text-outline">
+              <span className="bg-gradient-to-r from-[var(--primary)] via-[var(--secondary)] to-[var(--primary-tint)] bg-clip-text text-transparent">
+                SafidoSwap
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-slate-100 font-bold text-outline-black">
+              <span className="text-[var(--primary-tint)]">Trade the waves</span>
+              <span className="mx-2 text-slate-300">,</span>
+              <span className="text-[var(--secondary-tint)]">crave the gains</span>
+            </p>
+          </div>
 
-      <div className="flex flex-wrap justify-center gap-8">
-        {cards.map((card) => (
-          <Link
-            key={card.to}
-            to={card.to}
-            className="group w-[320px] max-w-full rounded-2xl border border-black/70
-                       bg-slate-900/70 overflow-hidden
-                       hover:border-[var(--primary)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.7)]
-                       transform hover:-translate-y-1 transition-all"
-          >
-            <div className="w-full">
-              <img
-                src={card.image}
-                alt={card.alt}
-                className="w-full h-auto object-cover block
-                           transition-transform duration-300 group-hover:scale-[1.03]"
-              />
-            </div>
+          <div className="space-y-6 text-xl text-slate-100 leading-relaxed mt-14 font-bold">
+            <p className="text-outline-black">
+              Welcome to the next evolution of DeFi on the Pharos Network. 
+              SafidoSwap offers seamless token swapping, automated liquidity provision, 
+              and community-driven rewards in a secure, non-custodial environment.
+            </p>
+            <p className="text-outline-black">
+              Whether you are here to swap, stake, or try your luck, 
+              our ecosystem is designed to maximize capital efficiency 
+              through extremely low fees and transparency.
+            </p>
+          </div>
+        </div>
 
-            <div className="bg-[var(--primary)] text-neutral-900 text-center px-4 py-3">
-              <h2 className="text-lg font-semibold">{card.title}</h2>
-              <p className="text-xs sm:text-sm opacity-90">
-                {card.subtitle}
-              </p>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </section>
+        <div 
+          className="w-full max-w-md shrink-0 relative z-10"
+          onClick={() => setHasInteracted(true)}
+        >
+          {/* Glow effect div removed as requested */}
+          <Swap />
+        </div>
+      </section>
+
+      <section id="features" className="space-y-10 px-4">
+        <div className="text-center space-y-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-100 drop-shadow-lg text-outline-black">
+            Ecosystem Features
+          </h2>
+          <p className="text-xl text-slate-200 font-bold text-outline-black">
+            Discover the core components of the protocol
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {features.map((card) => {
+             const Wrapper = card.external ? 'a' : Link
+             const props = card.external ? { href: card.to, target: '_blank', rel: 'noopener noreferrer' } : { to: card.to }
+             
+             return (
+              <Wrapper
+                key={card.title}
+                {...props}
+                className="group relative rounded-2xl border border-white/10
+                           bg-slate-900/30 backdrop-blur-sm overflow-hidden p-8
+                           hover:border-[var(--primary)] hover:shadow-[0_0_30px_rgba(var(--primary-rgb),0.2)]
+                           transition-all duration-300 transform hover:-translate-y-1
+                           flex flex-col justify-start min-h-[260px]"
+              >
+                <div className="relative z-10 space-y-4">
+                  <h3 className="text-2xl font-extrabold text-neutral-100 group-hover:text-[var(--primary-tint)] transition-colors text-outline-black">
+                    {card.title}
+                  </h3>
+                  <p className="text-base text-slate-100 leading-relaxed font-bold opacity-90 text-outline-black">
+                    {card.subtitle}
+                  </p>
+                </div>
+                
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/0 to-[var(--secondary)]/0 group-hover:from-[var(--primary)]/5 group-hover:to-[var(--secondary)]/10 transition-all duration-500" />
+              </Wrapper>
+            )
+          })}
+        </div>
+      </section>
+    </div>
   )
 }
